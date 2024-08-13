@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เก็บข้อมูล</title>
+</head>
+<body>
+    <h1>แบบฟอร์มเก็บข้อมูล</h1>
+    <form id="dataForm">
+        <label for="place">ที่:</label><br>
+        <input type="text" id="place" name="place"><br><br>
+
+        <label for="name">ชื่อ:</label><br>
+        <input type="text" id="name" name="name"><br><br>
+
+        <label for="phone">เบอร์โทร:</label><br>
+        <input type="text" id="phone" name="phone"><br><br>
+
+        <label for="job">งานที่ต้องการ:</label><br>
+        <input type="text" id="job" name="job"><br><br>
+
+        <label for="location">ตำแหน่ง (lat, long):</label><br>
+        <input type="text" id="location" name="location"><br><br>
+
+        <button type="button" onclick="submitData()">ส่งข้อมูล</button>
+    </form>
+
+    <script>
+        function submitData() {
+            var place = document.getElementById("place").value;
+            var name = document.getElementById("name").value;
+            var phone = document.getElementById("phone").value;
+            var job = document.getElementById("job").value;
+            var location = document.getElementById("location").value;
+
+            var data = {
+                place: place,
+                name: name,
+                phone: phone,
+                job: job,
+                location: location
+            };
+
+            fetch("YOUR_GOOGLE_SCRIPT_URL", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert("ส่งข้อมูลเรียบร้อย");
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        }
+    </script>
+</body>
+</html>
