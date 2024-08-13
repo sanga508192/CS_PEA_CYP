@@ -1,69 +1,58 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-      label {
-        display: block;
-        margin-top: 10px;
-      }
-      input[type="text"], input[type="tel"] {
-        width: 100%;
-        padding: 8px;
-        margin-top: 5px;
-        box-sizing: border-box;
-      }
-      button {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #45a049;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>ฟอร์มเก็บข้อมูล</h2>
-    <form id="dataForm">
-      <label for="name">ชื่อ:</label>
-      <input type="text" id="name" name="name" required>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบฟอร์มเก็บข้อมูล</title>
+</head>
+<body>
+    <h2>แบบฟอร์มเก็บข้อมูล</h2>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSfIXk0aHpB_RTkOZ6FdX5QemOxb-lcUtG07ZXmHLjxkW2kz-g/formResponse" method="POST">
+        <!-- ที่ (รันอัตโนมัติ) -->
+        <input type="hidden" name="entry.XXXXXXX" value="Auto generated">
 
-      <label for="phone">เบอร์โทร:</label>
-      <input type="tel" id="phone" name="phone" required>
+        <!-- ชื่อ -->
+        <label for="name">ชื่อ:</label>
+        <input type="text" id="name" name="entry.XXXXXXXXX" required><br><br>
 
-      <label for="job">งานที่ต้องการ:</label>
-      <input type="text" id="job" name="job" required>
+        <!-- เบอร์โทร -->
+        <label for="phone">เบอร์โทร:</label>
+        <input type="tel" id="phone" name="entry.XXXXXXXXX" required><br><br>
 
-      <label for="location">ตำแหน่ง (ใส่ URL จาก Google Maps):</label>
-      <input type="text" id="location" name="location" required>
+        <!-- งานที่ต้องการ -->
+        <label for="job">งานที่ต้องการ:</label>
+        <input type="text" id="job" name="entry.XXXXXXXXX" required><br><br>
 
-      <button type="button" onclick="submitData()">บันทึกข้อมูล</button>
+        <!-- ปักหมุด ตำแหน่ง -->
+        <label for="location">ตำแหน่ง:</label>
+        <input type="text" id="location" name="entry.XXXXXXXXX" placeholder="กรุณากดปุ่มเพื่อปักหมุดตำแหน่ง" required><br><br>
+
+        <!-- ปุ่มปักหมุดตำแหน่ง -->
+        <button type="button" onclick="getLocation()">ปักหมุดตำแหน่ง</button><br><br>
+
+        <!-- ปุ่มบันทึก -->
+        <input type="submit" value="บันทึกข้อมูล">
     </form>
 
-    <p id="result"></p>
-
     <script>
-      function submitData() {
-        var formData = {
-          name: document.getElementById('name').value,
-          phone: document.getElementById('phone').value,
-          job: document.getElementById('job').value,
-          location: document.getElementById('location').value
-        };
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                alert("บราวเซอร์ของคุณไม่รองรับการปักหมุดตำแหน่ง");
+            }
+        }
 
-        google.script.run.withSuccessHandler(function(response) {
-          document.getElementById('result').innerText = response;
-          document.getElementById('dataForm').reset();
-        }).submitData(formData);
-      }
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            var location = lat + "," + lon;
+            document.getElementById("location").value = location;
+
+            // สำหรับเปิดในแผนที่
+            var mapUrl = "https://www.google.com/maps/search/?api=1&query=" + lat + "," + lon;
+            window.open(mapUrl, "_blank");
+        }
     </script>
-  </body>
+</body>
 </html>
