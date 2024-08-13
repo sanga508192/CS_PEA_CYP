@@ -1,55 +1,63 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
-    <script>
-      function onSubmit() {
-        var name = document.getElementById('name').value;
-        var phone = document.getElementById('phone').value;
-        var task = document.getElementById('task').value;
-        var location = document.getElementById('location').value;
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ฟอร์มเก็บข้อมูล</title>
+</head>
+<body>
+    <h1>ฟอร์มเก็บข้อมูล</h1>
+    <form id="dataForm">
+        <label for="date">วันที่:</label>
+        <input type="date" id="date" name="date" required><br><br>
 
-        google.script.run.withSuccessHandler(onSuccess).submitForm({name: name, phone: phone, task: task, location: location});
-      }
+        <label for="name">ชื่อ:</label>
+        <input type="text" id="name" name="name" required><br><br>
 
-      function onSuccess(response) {
-        document.getElementById('output').innerHTML = response;
-        document.getElementById('form').reset();
-      }
+        <label for="phone">เบอร์โทร:</label>
+        <input type="tel" id="phone" name="phone" required><br><br>
 
-      function getLocation() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(showPosition);
-        } else { 
-          alert("Geolocation is not supported by this browser.");
-        }
-      }
+        <label for="task">งานที่ต้องการ:</label>
+        <input type="text" id="task" name="task" required><br><br>
 
-      function showPosition(position) {
-        var lat = position.coords.latitude;
-        var lng = position.coords.longitude;
-        document.getElementById('location').value = lat + ',' + lng;
-      }
-    </script>
-  </head>
-  <body>
-    <h1>Data Collection Form</h1>
-    <form id="form" onsubmit="onSubmit(); return false;">
-      <label for="name">Name:</label><br>
-      <input type="text" id="name" name="name" required><br><br>
+        <label for="location">ตำแหน่ง (ปักหมุด):</label>
+        <button type="button" id="locationBtn" onclick="getLocation()">ปักหมุดตำแหน่ง</button><br><br>
 
-      <label for="phone">Phone Number:</label><br>
-      <input type="text" id="phone" name="phone" required><br><br>
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
 
-      <label for="task">Task:</label><br>
-      <input type="text" id="task" name="task" required><br><br>
-
-      <label for="location">Location:</label><br>
-      <input type="text" id="location" name="location" readonly><br>
-      <button type="button" onclick="getLocation()">Pin Location</button><br><br>
-
-      <input type="submit" value="Submit">
+        <button type="submit">บันทึกข้อมูล</button>
     </form>
-    <p id="output"></p>
-  </body>
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function showPosition(position) {
+            document.getElementById('latitude').value = position.coords.latitude;
+            document.getElementById('longitude').value = position.coords.longitude;
+            alert('ตำแหน่งถูกบันทึก: ' + position.coords.latitude + ', ' + position.coords.longitude);
+        }
+
+        document.getElementById('dataForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            google.script.run.withSuccessHandler(function() {
+                alert('บันทึกข้อมูลเรียบร้อยแล้ว');
+                document.getElementById('dataForm').reset();
+            }).saveData(
+                document.getElementById('date').value,
+                document.getElementById('name').value,
+                document.getElementById('phone').value,
+                document.getElementById('task').value,
+                document.getElementById('latitude').value,
+                document.getElementById('longitude').value
+            );
+        });
+    </script>
+</body>
 </html>
