@@ -1,71 +1,55 @@
 <!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ฟอร์มเก็บข้อมูล</title>
-</head>
-<body>
-    <h1>ฟอร์มเก็บข้อมูล</h1>
-    <form id="dataForm">
-        <label for="name">ชื่อ:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
-        
-        <label for="phone">เบอร์โทร:</label><br>
-        <input type="tel" id="phone" name="phone" required><br><br>
-        
-        <label for="task">งานที่ต้องการ:</label><br>
-        <input type="text" id="task" name="task" required><br><br>
-        
-        <label for="location">ปักหมุด ตำแหน่ง:</label><br>
-        <button type="button" onclick="getLocation()">ปักหมุดตำแหน่ง</button><br><br>
-        
-        <input type="hidden" id="latitude" name="latitude">
-        <input type="hidden" id="longitude" name="longitude">
-        
-        <input type="submit" value="ส่งข้อมูล">
-    </form>
-
+<html>
+  <head>
+    <base target="_top">
     <script>
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    document.getElementById('latitude').value = position.coords.latitude;
-                    document.getElementById('longitude').value = position.coords.longitude;
-                    alert("ตำแหน่งถูกปักหมุดเรียบร้อยแล้ว!");
-                });
-            } else {
-                alert("เบราว์เซอร์ของคุณไม่รองรับการปักหมุดตำแหน่ง");
-            }
+      function onSubmit() {
+        var name = document.getElementById('name').value;
+        var phone = document.getElementById('phone').value;
+        var task = document.getElementById('task').value;
+        var location = document.getElementById('location').value;
+
+        google.script.run.withSuccessHandler(onSuccess).submitForm({name: name, phone: phone, task: task, location: location});
+      }
+
+      function onSuccess(response) {
+        document.getElementById('output').innerHTML = response;
+        document.getElementById('form').reset();
+      }
+
+      function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition);
+        } else { 
+          alert("Geolocation is not supported by this browser.");
         }
+      }
 
-        document.getElementById('dataForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            var name = document.getElementById('name').value;
-            var phone = document.getElementById('phone').value;
-            var task = document.getElementById('task').value;
-            var latitude = document.getElementById('latitude').value;
-            var longitude = document.getElementById('longitude').value;
-
-            // ตัวอย่างของการส่งข้อมูลไปที่ Google Sheets ผ่าน Google Forms
-            var formData = new FormData();
-            formData.append('entry.YOUR_NAME_ENTRY_ID', name);
-            formData.append('entry.YOUR_PHONE_ENTRY_ID', phone);
-            formData.append('entry.YOUR_TASK_ENTRY_ID', task);
-            formData.append('entry.YOUR_LATITUDE_ENTRY_ID', latitude);
-            formData.append('entry.YOUR_LONGITUDE_ENTRY_ID', longitude);
-
-            fetch('https://docs.google.com/forms/d/YOUR_GOOGLE_FORM_ID/formResponse', {
-                method: 'POST',
-                body: formData,
-                mode: 'no-cors'
-            }).then(function() {
-                alert('ข้อมูลถูกส่งเรียบร้อยแล้ว!');
-            }).catch(function(error) {
-                console.error('Error:', error);
-            });
-        });
+      function showPosition(position) {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+        document.getElementById('location').value = lat + ',' + lng;
+      }
     </script>
-</body>
+  </head>
+  <body>
+    <h1>Data Collection Form</h1>
+    <form id="form" onsubmit="onSubmit(); return false;">
+      <label for="name">Name:</label><br>
+      <input type="text" id="name" name="name" required><br><br>
+
+      <label for="phone">Phone Number:</label><br>
+      <input type="text" id="phone" name="phone" required><br><br>
+
+      <label for="task">Task:</label><br>
+      <input type="text" id="task" name="task" required><br><br>
+
+      <label for="location">Location:</label><br>
+      <input type="text" id="location" name="location" readonly><br>
+      <button type="button" onclick="getLocation()">Pin Location</button><br><br>
+
+      <input type="submit" value="Submit">
+    </form>
+    <p id="output"></p>
+  </body>
 </html>
